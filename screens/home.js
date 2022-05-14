@@ -17,7 +17,7 @@ const Home = ({navigation}) => {
             </View>
 
             <TouchableOpacity onPress={()=>navigation.navigate('Quiz')} style={styles.textContainer}>
-              <Text style={styles.textH1}>1</Text>
+              <Text style={styles.textH1}>Expert 1</Text>
               <Text style={styles.text}>Strategie finansowe {"\n"}strategie marketingowe</Text>
             </TouchableOpacity>
 
@@ -30,7 +30,7 @@ const Home = ({navigation}) => {
             </View>
 
             <View style={styles.textContainer}>
-              <Text style={styles.textH1}>2</Text>
+              <Text style={styles.textH1}>Expert 2</Text>
               <Text style={styles.text}>Rynek nieruchomości</Text>
             </View>
 
@@ -43,7 +43,7 @@ const Home = ({navigation}) => {
             </View>
 
             <View style={styles.textContainer}>
-              <Text style={styles.textH1}>3</Text>
+              <Text style={styles.textH1}>Expert 3</Text>
               <Text style={styles.text}>Kryptowaluty</Text>
             </View>
 
@@ -56,7 +56,7 @@ const Home = ({navigation}) => {
             </View>
 
             <View style={styles.textContainer}>
-              <Text style={styles.textH1}>4</Text>
+              <Text style={styles.textH1}>Expert 4</Text>
               <Text style={styles.text}>Oszczędzanie</Text>
             </View>
 
@@ -127,9 +127,9 @@ const styles = StyleSheet.create({
   },
   textH1:{
     textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: 17,
     color:'black',
+    marginBottom:5
   },
   text:{
     textAlign:'center'
