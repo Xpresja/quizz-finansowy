@@ -1,69 +1,89 @@
-import React from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
+import React, {useRef} from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions, Animated } from 'react-native';
+import QuestionsCategoriesLayout from '../components/QuestionsCategoriesLayout'
 
+
+const windowHeight = Dimensions.get('window').height;
+const CATEGORIES_H = windowHeight*0.6;
+const BANNER_H = windowHeight*0.4;
+const Experts = [
+  {
+    "id":"1",
+    "expert": "Expert 1",
+    "topics": 'Strategie finansowe\nStrategie marketingowe'
+  },
+  {
+    "id":"2",
+    "expert": "Expert 2",
+    "topics": 'Rynek nieruchomości'
+  },
+  , {
+    "id":"3",
+    "expert": "Expert 3",
+    "topics": 'Kryptowaluty'
+  },
+  {
+    "id":"4",
+    "expert": "Expert 4",
+    "topics": 'Oszczędzanie'
+  },
+  {
+    "id":"5",
+    "expert": "Expert 5",
+    "topics": 'Akcje \n metale szlachetne'
+  }
+]
 
 const Home = ({navigation}) => {
+
+
+  const scrollA = useRef(new Animated.Value(0)).current;  
+
   return (
-    <View style={styles.container}>
-      <View style={styles.baner}><Text>Baner</Text></View>
-      <View style={styles.subCategories}>
-        <View style={styles.textQuestions}><Text>Kategorie pytań</Text></View>
-        <View style={styles.subCategoryContainer}>
-          <View style={[styles.subCategory, styles.subCategoryMargin]}>
-            <View style={styles.imageContainer}>
-              <Image
-                style={styles.expertsImage}
-                source={{ uri: 'https://reactjs.org/logo-og.png' }} />
-            </View>
 
-            <TouchableOpacity onPress={()=>navigation.navigate('Quiz')} style={styles.textContainer}>
-              <Text style={styles.textH1}>Expert 1</Text>
-              <Text style={styles.text}>Strategie finansowe {"\n"}strategie marketingowe</Text>
-            </TouchableOpacity>
-
-          </View>
-          <View style={styles.subCategory}>
-            <View style={styles.imageContainer}>
-              <Image
-                style={styles.expertsImage}
-                source={{ uri: 'https://reactjs.org/logo-og.png' }} />
-            </View>
-
-            <View style={styles.textContainer}>
-              <Text style={styles.textH1}>Expert 2</Text>
-              <Text style={styles.text}>Rynek nieruchomości</Text>
-            </View>
-
-          </View>
-          <View style={styles.subCategory}>
-            <View style={styles.imageContainer}>
-              <Image
-                style={styles.expertsImage}
-                source={{ uri: 'https://reactjs.org/logo-og.png' }} />
-            </View>
-
-            <View style={styles.textContainer}>
-              <Text style={styles.textH1}>Expert 3</Text>
-              <Text style={styles.text}>Kryptowaluty</Text>
-            </View>
-
-          </View>
-          <View style={styles.subCategory}>
-            <View style={styles.imageContainer}>
-              <Image
-                style={styles.expertsImage}
-                source={{ uri: 'https://reactjs.org/logo-og.png' }} />
-            </View>
-
-            <View style={styles.textContainer}>
-              <Text style={styles.textH1}>Expert 4</Text>
-              <Text style={styles.text}>Oszczędzanie</Text>
-            </View>
-
-          </View>
+<View style={{backgroundColor:'black'}}>
+      
+      <Animated.ScrollView
+        onScroll={Animated.event(
+          [{nativeEvent: {contentOffset: {y: scrollA}}}],
+          {useNativeDriver: true},
+        )}
+        scrollEventThrottle={16}
+      >
+        <View style={styles.bannerContainer}>
+          <Animated.Image
+            style={styles.banner(scrollA)}
+            source={{ uri: 'https://reactjs.org/logo-og.png' }}
+          />
         </View>
+        <View style={[styles.subCategories, { minHeight: CATEGORIES_H }]}>
+
+          <View style={styles.textQuestions}><Text>Kategorie pytań</Text></View>
+          <View style={styles.subCategoryContainer}>
+
+            {Experts.map(user => (
+
+              <View key={user.id} style={[styles.subCategory]}>
+                <View>
+                  <Image
+                    style={styles.expertsImage}
+                    source={{ uri: 'https://reactjs.org/logo-og.png' }} />
+                </View>
+                <TouchableOpacity onPress={() => navigation.navigate("Quiz")} style={styles.textContainer}>
+                  <Text style={styles.textH1}>{user.expert}</Text>
+                  <Text style={styles.textH1}>{user.topics}</Text>
+                </TouchableOpacity>
+              </View>
+
+
+            ))}
+
+          </View>
+
       </View>
+      </Animated.ScrollView>
     </View>
+
   )
 }
 
@@ -72,30 +92,47 @@ export default Home
 const styles = StyleSheet.create({
 
   
-  container:{
-    flex:1,
-    backgroundColor:'grey',
+  text: {
+    margin: 24,
+    fontSize: 16,
   },
-  baner:{
-    backgroundColor:'grey',
-    flex:2,
-    alignItems:'center'
+  bannerContainer: {
+    marginTop: -1000,
+    paddingTop: 1000,
+    alignItems: 'center',
+    overflow: 'hidden',
   },
+  banner: scrollA => ({
+    height: BANNER_H,
+    width: '200%',
+    transform: [
+      {
+        translateY: scrollA.interpolate({
+          inputRange: [-BANNER_H, 0, BANNER_H, BANNER_H + 1],
+          outputRange: [-BANNER_H / 2, 0, BANNER_H * 0.75, BANNER_H * 0.75],
+        }),
+      },
+      {
+        scale: scrollA.interpolate({
+          inputRange: [-BANNER_H, 0, BANNER_H, BANNER_H + 1],
+          outputRange: [2, 1, 0.5, 0.5],
+        }),
+      },
+    ],
+  }),
   subCategories:{
-    flex:4,
+    height:'100%',
     backgroundColor:'white',
     borderTopLeftRadius: 44,
     borderTopRightRadius: 44,
-
-  },
-  subCategoryContainer:{
-    flex:9,
+  
   },
   textQuestions:{
+    marginTop:15,
     alignItems:'center',
     justifyContent:'center',
-    flex:1,
   },
+
   subCategory:{
     backgroundColor:'white',
     marginTop: 20,
@@ -118,21 +155,13 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     resizeMode:'cover'
   },
-
   textContainer:{
+    alignSelf:'stretch',
     alignItems:'center',
-    flex:1,
-    marginRight:20
-    
-  },
+    justifyContent:'center',
+    flex:1
+  },  
   textH1:{
-    textAlign: 'center',
-    fontSize: 17,
-    color:'black',
-    marginBottom:5
-  },
-  text:{
     textAlign:'center'
   }
-  
 })

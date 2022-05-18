@@ -3,6 +3,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Home from '../screens/home';
 import Quiz from '../screens/quiz';
 import Result from '../screens/result';
+import Testowanie from '../screens/testowanie';
 
 const Stack = createStackNavigator();
 
@@ -20,8 +21,8 @@ function MyStack() {
         options={{headerShown: false}}
       />
       <Stack.Screen
-        name="Result"
-        component={Result}
+        name="Testowanie"
+        component={Testowanie}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

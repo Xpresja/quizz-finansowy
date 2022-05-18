@@ -5,12 +5,17 @@ import MyStack from './navigation';
 import Home from './screens/home';
 import Quiz from './screens/quiz';
 import Result from './screens/result';
+import HomeScreen from './screens/testowanie';
+import Testowanie from './screens/testowanie';
 
 const App = () => {
-  return (
+  return (  
     <NavigationContainer>
       <MyStack />
     </NavigationContainer>
+    // <View>
+    //   <Text>ddd</Text>
+    // </View>
   );
 };
 

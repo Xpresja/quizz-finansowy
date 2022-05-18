@@ -4,16 +4,21 @@ import person from '../API/API';
 import QuestionsCategoriesLayout from '../components/QuestionsCategoriesLayout'
 
 
- const windowHeight = Dimensions.get('window').height;
- const CATEGORIES_H = windowHeight*0.6;
- const BANNER_H = windowHeight*0.4;
 
-const Quiz = ({navigation}) => {
+
+ const BANNER_H = 350;
+ const TOPNAVI_H = 50;
+ const windowHeight = Dimensions.get('window').height;
+ const categoriesLayoutHeight = windowHeight*0.7;
+
+
+const HomeScreen = () => {
   const scrollA = useRef(new Animated.Value(0)).current;
   return (
-    <View style={{backgroundColor:'black'}}>
+    <View>
       
       <Animated.ScrollView
+        // onScroll={e => console.log(e.nativeEvent.contentOffset.y)}
         onScroll={Animated.event(
           [{nativeEvent: {contentOffset: {y: scrollA}}}],
           {useNativeDriver: true},
@@ -26,7 +31,7 @@ const Quiz = ({navigation}) => {
             source={{ uri: 'https://reactjs.org/logo-og.png' }}
           />
         </View>
-        <View style={[styles.subCategories, { minHeight: CATEGORIES_H }]}>
+        <View style={[styles.subCategories, { minHeight: categoriesLayoutHeight }]}>
 
           <View style={styles.textQuestions}><Text>Kategorie pytań</Text></View>
 
@@ -34,7 +39,7 @@ const Quiz = ({navigation}) => {
 
             {person.map(user => (
 
-              <QuestionsCategoriesLayout key={user.id} category={user.category} navigation={navigation}  />
+              <QuestionsCategoriesLayout key={user.id} category={user.category}  />
 
             ))}
 
@@ -80,14 +85,12 @@ const styles = {
     backgroundColor:'white',
     borderTopLeftRadius: 44,
     borderTopRightRadius: 44,
-   
   
   },
   textQuestions:{
-    marginTop:15,
     alignItems:'center',
     justifyContent:'center',
   },
 };
 
-export default Quiz;
+export default HomeScreen;
