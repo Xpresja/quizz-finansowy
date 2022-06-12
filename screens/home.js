@@ -9,27 +9,27 @@ const BANNER_H = windowHeight*0.4;
 const Experts = [
   {
     "id":"1",
-    "expert": "Expert 1",
+    "expert": "Expert_1",
     "topics": 'Strategie finansowe\nStrategie marketingowe'
   },
   {
     "id":"2",
-    "expert": "Expert 2",
+    "expert": "Expert_2",
     "topics": 'Rynek nieruchomości'
   },
   , {
     "id":"3",
-    "expert": "Expert 3",
+    "expert": "Expert_3",
     "topics": 'Kryptowaluty'
   },
   {
     "id":"4",
-    "expert": "Expert 4",
+    "expert": "Expert_4",
     "topics": 'Oszczędzanie'
   },
   {
     "id":"5",
-    "expert": "Expert 5",
+    "expert": "Expert_5",
     "topics": 'Akcje \n metale szlachetne'
   }
 ]
@@ -41,7 +41,7 @@ const Home = ({navigation}) => {
 
   return (
 
-<View style={{backgroundColor:'black'}}>
+<View style={{backgroundColor:'#222222'}}>
       
       <Animated.ScrollView
         onScroll={Animated.event(
@@ -69,7 +69,11 @@ const Home = ({navigation}) => {
                     style={styles.expertsImage}
                     source={{ uri: 'https://reactjs.org/logo-og.png' }} />
                 </View>
-                <TouchableOpacity onPress={() => navigation.navigate("Quiz")} style={styles.textContainer}>
+                <TouchableOpacity onPress={() => {
+                  return navigation.navigate("Categories", {
+                    expert: user.expert
+                  });
+                }} style={styles.textContainer}>
                   <Text style={styles.textH1}>{user.expert}</Text>
                   <Text style={styles.textH1}>{user.topics}</Text>
                 </TouchableOpacity>

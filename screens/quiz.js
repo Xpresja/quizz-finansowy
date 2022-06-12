@@ -1,93 +1,240 @@
-import React, {useRef} from 'react';
-import {View, ScrollView, Image, Animated, Text, Dimensions} from 'react-native';
-import person from '../API/API';
-import QuestionsCategoriesLayout from '../components/QuestionsCategoriesLayout'
+import { StyleSheet, Text, View, StatusBar, TouchableOpacity, Modal} from 'react-native'
+import React, {useState, useEffect } from 'react'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 
- const windowHeight = Dimensions.get('window').height;
- const CATEGORIES_H = windowHeight*0.6;
- const BANNER_H = windowHeight*0.4;
+const Quiz = ({navigation, route}) => {
 
-const Quiz = ({navigation}) => {
-  const scrollA = useRef(new Animated.Value(0)).current;
-  return (
-    <View style={{backgroundColor:'black'}}>
-      
-      <Animated.ScrollView
-        onScroll={Animated.event(
-          [{nativeEvent: {contentOffset: {y: scrollA}}}],
-          {useNativeDriver: true},
-        )}
-        scrollEventThrottle={16}
-      >
-        <View style={styles.bannerContainer}>
-          <Animated.Image
-            style={styles.banner(scrollA)}
-            source={{ uri: 'https://reactjs.org/logo-og.png' }}
-          />
-        </View>
-        <View style={[styles.subCategories, { minHeight: CATEGORIES_H }]}>
+  const {quizData} = route.params;
 
-          <View style={styles.textQuestions}><Text>Kategorie pytań</Text></View>
+  // console.log(quizData, "-----------------To jest route z category.js")
 
-          <View style={styles.subCategoryContainer}>
-
-            {person.map(user => (
-
-              <QuestionsCategoriesLayout key={user.id} category={user.category} navigation={navigation}  />
-
-            ))}
-
-          </View>
-
-      </View>
-      </Animated.ScrollView>
-    </View>
-  );
-};
-
-const styles = {
-  text: {
-    margin: 24,
-    fontSize: 16,
-  },
-  bannerContainer: {
-    marginTop: -1000,
-    paddingTop: 1000,
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
-  banner: scrollA => ({
-    height: BANNER_H,
-    width: '200%',
-    transform: [
-      {
-        translateY: scrollA.interpolate({
-          inputRange: [-BANNER_H, 0, BANNER_H, BANNER_H + 1],
-          outputRange: [-BANNER_H / 2, 0, BANNER_H * 0.75, BANNER_H * 0.75],
-        }),
-      },
-      {
-        scale: scrollA.interpolate({
-          inputRange: [-BANNER_H, 0, BANNER_H, BANNER_H + 1],
-          outputRange: [2, 1, 0.5, 0.5],
-        }),
-      },
-    ],
-  }),
-  subCategories:{
-    height:'100%',
-    backgroundColor:'white',
-    borderTopLeftRadius: 44,
-    borderTopRightRadius: 44,
-   
   
-  },
-  textQuestions:{
-    marginTop:15,
-    alignItems:'center',
-    justifyContent:'center',
-  },
-};
 
-export default Quiz;
+  // const Apidata = data[0].data;
+  // console.log(Apidata, "----------------- to natomiast jest dawne api lokalne")
+
+  const filteredData = quizData.filter(element => {
+    return element.difficulty ==='medium'
+  }) 
+  
+  
+  let GameData = filteredData.slice(0,5);
+
+  const shuffleArray=(array)=> {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+
+  const [test, setTest] = useState()
+  const [index, setIndex]  = useState(0);
+  const [correctAnswer, setcorrectAnswer] = useState(null);
+  const [currentOptionSelected , setcurrentOptionSelected ] = useState(null)
+  const [isOptionDisabled, setIsOptionDisabled] = useState(false)
+  const [showNextButton, setShowNextButton] = useState(false)
+  const [score, setScore] = useState(0)
+  const [showScoreModal, setShowScoreModal] = useState(false)
+
+
+
+    const prepareGameData = () => {
+    //tutaj do zmiennej przechowującej wszystkie dane do całego zestawu gry, będę obrabiał te dane czyli
+    //1. Filtrował, żeby użytkownik miał konkretny zestaw pytań od poziomu jego umiejętności
+    //2. Wycinał poprawne odpowiedzi, żeby użytkownik nie dostał ponownie tej samej poprawnej odpowiedzi
+    //dane będą 
+    // a) pobierane, które były poprawne, czyli w przyciskach odpowiedzi
+    // b) od razu wycinane (zależy czy będą konsekwencje) lub po przycisku do ostatniego pytania, który przynosi do modala 
+    //3.Tasował, żeby uż. nie dostawał ponownie takiego samego pytania
+
+    const filteredData = quizData.filter(element => {
+      return element.difficulty==='easy'
+    }) //filter data based on difficulty level
+    const slicedData = filteredData.slice(0,5) //show 5 questions per game
+    setTest(slicedData)
+
+  }
+
+
+
+    useEffect(() => {
+            
+      prepareGameData()
+
+    }, [])
+   
+
+const validateOption = (pressedAnswer) => {
+
+  const correct_answer = GameData[index]['correct_option'];
+  setcorrectAnswer(correct_answer)
+  setcurrentOptionSelected(pressedAnswer)
+  setIsOptionDisabled(true)
+  setShowNextButton(true)
+
+  if(correct_answer===pressedAnswer){
+    setScore(score+1)
+  }
+
+}  
+
+const renderQuestion = () => {
+  return (
+    <View style={{padding:30}}>
+      <Text style={{fontSize:17}}>{index +1}/{GameData.length}</Text>
+      <Text style={{fontSize:17}}>{GameData[index].question}</Text>
+    </View>
+  )
+}
+const renderOptions = () => {
+
+  const options = GameData[index].options;
+  return(
+
+    <View>
+      {options.map((option, key) => (
+
+        <TouchableOpacity key={key} disabled={isOptionDisabled} style={{
+          backgroundColor:'white',
+          alignItems:'center',
+          marginTop:10,
+          marginHorizontal:10,
+          padding:20,
+          
+          borderRadius:20,
+          shadowColor: "green",
+          shadowOpacity: 0.25,
+          elevation: 5,
+          backgroundColor: correctAnswer == option 
+          ? 'green'
+          : option == currentOptionSelected
+          ? 'red'
+          : 'white'
+
+          
+        }} onPress={()=> validateOption(option)} > 
+          <Text>{option}</Text>
+        </TouchableOpacity>
+))}
+     
+   </View>
+  )
+}
+
+const renderNext = () => {
+
+
+  return (
+  <View style={{
+    flex:1,
+    alignItems:'flex-end',
+    justifyContent:'flex-end',
+    margin: 10,
+    marginBottom: 20
+  }}  >
+    <TouchableOpacity activeOpacity={.9} onPress={() => {
+
+
+      if( (index+1) >= GameData.length){
+
+        setShowScoreModal(true)
+        console.log('uż. kliknął z piątej odpowiedzi na przycisk next')
+
+
+
+      }
+      else{
+
+        console.log(index+1)
+        setIndex(index+1)
+        setIsOptionDisabled(false)
+        setShowNextButton(false)
+        setcorrectAnswer(null)
+        setcurrentOptionSelected(null)
+      }
+
+    }} ><Text style={{
+      backgroundColor: 'white',
+      padding: 20,
+      paddingHorizontal: 45,
+      borderRadius: 20,
+
+      shadowColor: "black",
+      shadowOpacity: 0.25,
+      elevation: 5,
+    }}
+    >Next</Text></TouchableOpacity>
+  </View>
+)}
+
+
+
+  return (
+    <SafeAreaView style={{flex:1, justifyContent:'flex-start'}}>
+      <StatusBar barStyle="light-content" backgroundColor={'black'} />
+
+      {renderQuestion()}
+      {renderOptions()}
+      {showNextButton ? renderNext(): null}
+      
+      {/* Score Modal */}
+      <Modal
+      animationType='slide'
+      transparent={true}
+      visible={showScoreModal}
+      >
+        <View style={{
+          flex:1,
+          backgroundColor:'blue',
+          alignItems:'center',
+          justifyContent:'center'
+        }}>
+          <View style={{
+            backgroundColor:'white',
+            width:'90%',
+            borderRadius:20,
+            padding:20,
+            alignItems:'center'
+          }}>
+            <Text>Zdobyłeś {score} punktów</Text>
+          </View>
+          <TouchableOpacity onPress={()=>{
+            setScore(0)
+            setIsOptionDisabled(false)
+            setIndex(0)
+            setShowScoreModal(false)
+            setShowNextButton(false)
+            
+          }} 
+            style={{
+            backgroundColor:'white',
+            width:'90%',
+            borderRadius:20,
+            padding:20,
+            alignItems:'center',
+            marginTop:10
+          }}>
+              <Text>Zagraj ponownie</Text>
+          </TouchableOpacity>
+
+        </View>
+      </Modal>
+     
+    </SafeAreaView>
+  )
+}
+
+export default Quiz
+
+const styles = StyleSheet.create({})
+
+// 1. Zrobić większą tablicę, potem pobrać tylko pierwszych 5 elementów z tablicy
+// 2. Poprawne odpowiedzi będą wycinane i wstawiane w inna tablicę z poprawnymi odpowiedziami, 
+// po to żeby użytkownik mógł w przyszłości ponowanie przerobić przerobione pytania
+// 3. Można zrobić filtr po odpowiedziach z poziomami trudności
+
+// Poprawna odpowiedz uzytkownika ma isc do osobnej tablicy, tak zeby pytanie użytkownika nie powtarzało się ponownie w jego 
+// procesie udzielania odpowiedzi. Niepoprawne odpowiedzi mają nadal zostać w pytań, zeby uzytkownik mogl ponownie udzielic na nie odpowiedz
+// Pytania będą mieszane, żeby użytkownik nie mógł od razu tych samych pytań niepoprawnych wyświetlać

@@ -1,24 +1,38 @@
-import React, {useRef} from 'react';
+import React, {useRef, useEffect, useState} from 'react';
 import {View, ScrollView, Image, Animated, Text, Dimensions} from 'react-native';
-import person from '../API/API';
 import QuestionsCategoriesLayout from '../components/QuestionsCategoriesLayout'
 
 
-
-
- const BANNER_H = 350;
- const TOPNAVI_H = 50;
  const windowHeight = Dimensions.get('window').height;
- const categoriesLayoutHeight = windowHeight*0.7;
+ const CATEGORIES_H = windowHeight * 0.6;
+ const BANNER_H = windowHeight * 0.4;
 
+ 
+const Categories = ({navigation, route}) => {
 
-const HomeScreen = () => {
+  const [quizCategoriesData, setQuizCategoriesData] = useState([])
+
+  const {expert} = route.params;
   const scrollA = useRef(new Animated.Value(0)).current;
+
+  const getData = async () => {
+    const url = `https://eu-central-1.aws.data.mongodb-api.com/app/application-0-ekvws/endpoint/zdalneAPIHurraFajnie?secret=sekret&arg1=${expert}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    setQuizCategoriesData(data)
+    console.log(data)
+  };
+  
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
-    <View>
+   
+   
+   <View style={{backgroundColor:'#222222'}}>
       
       <Animated.ScrollView
-        // onScroll={e => console.log(e.nativeEvent.contentOffset.y)}
         onScroll={Animated.event(
           [{nativeEvent: {contentOffset: {y: scrollA}}}],
           {useNativeDriver: true},
@@ -31,19 +45,22 @@ const HomeScreen = () => {
             source={{ uri: 'https://reactjs.org/logo-og.png' }}
           />
         </View>
-        <View style={[styles.subCategories, { minHeight: categoriesLayoutHeight }]}>
+        <View style={[styles.subCategories, { minHeight: CATEGORIES_H }]}>
 
           <View style={styles.textQuestions}><Text>Kategorie pytań</Text></View>
 
           <View style={styles.subCategoryContainer}>
+            
+          {quizCategoriesData.map((user, key) => (
 
-            {person.map(user => (
-
-              <QuestionsCategoriesLayout key={user.id} category={user.category}  />
+            
+                <QuestionsCategoriesLayout key={key} category={user.category} quizData={user.data} navigation={navigation}  />
+         
 
             ))}
+          
 
-          </View>
+          </View>           
 
       </View>
       </Animated.ScrollView>
@@ -85,12 +102,14 @@ const styles = {
     backgroundColor:'white',
     borderTopLeftRadius: 44,
     borderTopRightRadius: 44,
+   
   
   },
   textQuestions:{
+    marginTop:15,
     alignItems:'center',
     justifyContent:'center',
   },
 };
 
-export default HomeScreen;
+export default Categories;

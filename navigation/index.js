@@ -1,9 +1,9 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import Home from '../screens/home';
-import Quiz from '../screens/quiz';
+import Categories from '../screens/categories';
 import Result from '../screens/result';
-import Testowanie from '../screens/testowanie';
+import Quiz from '../screens/quiz';
 
 const Stack = createStackNavigator();
 
@@ -16,15 +16,24 @@ function MyStack() {
         options={{headerShown: false}}
       />
       <Stack.Screen
+        name="Categories"
+        component={Categories}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Result"
+        component={Result}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
         name="Quiz"
         component={Quiz}
         options={{headerShown: false}}
       />
-      <Stack.Screen
-        name="Testowanie"
-        component={Testowanie}
-        options={{headerShown: false}}
-      />
+     
+     
+     
+      
     </Stack.Navigator>
   );
 }
